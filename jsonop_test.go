@@ -109,7 +109,9 @@ func TestMarshal(t *testing.T) {
 
 func TestTraversal(t *testing.T) {
 	byt6 := []byte(`{
+			"bool_val": true,
 			"num":6,
+			"num_list": [3, 5, 7],
 			"strs":["a","b"],
 			"stra": {
 				"num2": 7,
