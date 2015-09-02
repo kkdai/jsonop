@@ -10,7 +10,7 @@ type Ops int
 
 const (
 	OpAdd Ops = iota + 1
-	OpDelete
+	OpSub
 	OpPrint
 )
 
@@ -27,37 +27,27 @@ func getJsonUnmarsh(jsb []byte) map[string]interface{} {
 }
 
 func compareTwo(one, two map[string]interface{}) bool {
-	if one == nil || two == nil {
+	if one == nil && two == nil {
+		return true
+	} else if one == nil || two == nil {
 		return false
 	}
 	return reflect.DeepEqual(one, two)
 }
 
+// To determin if two input json content is equal or not
+// Please note: none equal to none, empty map equal to empty map
 func JsonEqual(jsA, jsB []byte) bool {
 	return compareTwo(getJsonUnmarsh(jsA), getJsonUnmarsh(jsB))
 }
 
-func actionByOp(objA, objB interface{}, op int) interface{} {
-	if reflect.TypeOf(objA) != reflect.TypeOf(objB) {
-		//type different abort op, return objA
-		return objA
-	}
-
-	switch v := objA.(type) {
-	case string:
-		fmt.Println(v)
-	case int32, int64:
-		fmt.Println(v)
-	//case SomeCustomType:
-	//	fmt.Println(v)
-	default:
-		fmt.Println("unknown")
-	}
-	//return interface{}
-	return objA
-}
-
 func jsonOps(objA, objB map[string]interface{}, op Ops) map[string]interface{} {
+
+	if objA == nil || objB == nil {
+		// None + B == None
+		// A + None == None
+		return nil
+	}
 
 	//Search all key in A first
 	for key, val := range objA {
@@ -91,6 +81,11 @@ func jsonOps(objA, objB map[string]interface{}, op Ops) map[string]interface{} {
 		}
 	}
 
+	//B set bigger than A, only need in AddOp
+	if op != OpAdd {
+		return objA
+	}
+
 	for key, val := range objB {
 		_, ok := objA[key]
 		if ok {
@@ -98,13 +93,7 @@ func jsonOps(objA, objB map[string]interface{}, op Ops) map[string]interface{} {
 			continue
 		}
 
-		//if reflect.TypeOf(val) != reflect.TypeOf(valA) {
-		//	//the same key bit type different, skip it.
-		//	continue
-		//}
-
 		switch v := val.(type) {
-
 		case []interface{}:
 			var emptySlice []interface{}
 			objA[key] = sliceOps(emptySlice, objB[key].([]interface{}), op)
@@ -125,9 +114,9 @@ func jsonOps(objA, objB map[string]interface{}, op Ops) map[string]interface{} {
 	return objA
 }
 
-func JsonAdd(jsA, jsB []byte) []byte {
-	retMap := jsonOps(getJsonUnmarsh(jsA), getJsonUnmarsh(jsB), OpAdd)
-	fmt.Println(" Ret map:", retMap)
+//Substract: Json object A substract Json object B
+func JsonSubtract(jsA, jsB []byte) []byte {
+	retMap := jsonOps(getJsonUnmarsh(jsA), getJsonUnmarsh(jsB), OpSub)
 	retByte, err := json.Marshal(retMap)
 	if err != nil {
 		fmt.Println(" Unmarshall error:", err)
@@ -136,42 +125,64 @@ func JsonAdd(jsA, jsB []byte) []byte {
 	return retByte
 }
 
-func parseInterface(key string, obj interface{}) {
-	//fmt.Println(" obj:", obj)
+//Add: To add two json data directly.
+//Please note the priciple to add two object as follow:
+// stringA + stringB = stringA concat stringB
+// sliceA + sliceB = sliceA append sliceB
+func JsonAdd(jsA, jsB []byte) []byte {
+	retMap := jsonOps(getJsonUnmarsh(jsA), getJsonUnmarsh(jsB), OpAdd)
+	retByte, err := json.Marshal(retMap)
+	if err != nil {
+		fmt.Println(" Unmarshall error:", err)
+		return nil
+	}
+	return retByte
+}
+
+func parseInterface(key string, obj interface{}, degree int) {
+
+	var indentString string
+	for i := 1; i <= degree; i++ {
+		indentString = indentString + "\t"
+	}
+
 	switch v := obj.(type) {
 
 	case []interface{}:
 		listObj := obj.([]interface{})
-		fmt.Printf("key:%s val:[", key)
+		fmt.Printf(indentString+"key:%s val:[", key)
 		for _, strV := range listObj {
 			fmt.Printf("%v,", strV)
 		}
 		fmt.Printf("]\n")
 		break
 	case bool:
-		fmt.Println("type:", v, " key:", key, " val:", obj)
+		fmt.Println(indentString+"type:", v, " key:", key, " val:", obj)
 		break
 	case string:
-		fmt.Println("type:", v, " key:", key, " val:", obj)
+		fmt.Println(indentString+"type:", v, " key:", key, " val:", obj)
 		break
 	case int32, int64, float64:
-		fmt.Println("type:", v, " key:", key, " val:", obj)
+		fmt.Println(indentString+"type:", v, " key:", key, " val:", obj)
 		break
 	case map[string]interface{}:
 		mapObj := obj.(map[string]interface{})
-		fmt.Println("key:", key, "{")
+		fmt.Println(indentString+"key:", key, "{")
 		for keyB, valB := range mapObj {
-			parseInterface(keyB, valB)
+			parseInterface(keyB, valB, degree+1)
 		}
-		fmt.Println("}")
+		fmt.Println(indentString + "}")
 		break
 	default:
-		fmt.Println("unknown key:", key, " type:", reflect.TypeOf(obj))
+		fmt.Println(indentString+"unknown key:", key, " type:", reflect.TypeOf(obj))
 	}
 }
 
+//To print out whole map structure
 func TraversalJson(jsn []byte) {
+	fmt.Printf("{\n")
 	for key, valA := range getJsonUnmarsh(jsn) {
-		parseInterface(key, valA)
+		parseInterface(key, valA, 1)
 	}
+	fmt.Printf("}\n")
 }

@@ -1,19 +1,25 @@
 package jsonop
 
-import (
-	"encoding/json"
-	"fmt"
-	"reflect"
-	"testing"
-)
+import "testing"
 
-func TestNil(t *testing.T) {
-	if JsonEqual(nil, nil) {
-		t.Errorf("Equal cannot handle nil")
+func TestEqualNil(t *testing.T) {
+	if !JsonEqual(nil, nil) {
+		t.Errorf("Equal cannot handle nil\n")
+	}
+
+	byt1 := []byte(`{}`)
+	if !JsonEqual(byt1, byt1) {
+		t.Errorf("Equal cannot handle empty json\n")
 	}
 }
 
 func TestEqual(t *testing.T) {
+	bytEmpty := []byte(`{}`)
+
+	if !JsonEqual(bytEmpty, bytEmpty) {
+		t.Errorf("Equal failed on empty map.")
+	}
+
 	byt1 := []byte(`{
 			"num":6,
 			"strs":"a",
@@ -25,11 +31,11 @@ func TestEqual(t *testing.T) {
 			"num2":7 }`)
 
 	if !JsonEqual(byt1, byt1) {
-		t.Errorf("Equal fail on json simple struct")
+		t.Errorf("Equal fail on json simple struct\n")
 	}
 
 	if !JsonEqual(byt1, byt2) {
-		t.Errorf("Equal fail on json address change")
+		t.Errorf("Equal fail on json address change\n")
 	}
 
 	byt3 := []byte(`{
@@ -43,10 +49,10 @@ func TestEqual(t *testing.T) {
 			"num2":7 }`)
 
 	if !JsonEqual(byt3, byt3) {
-		t.Errorf("Equal fail on json array.")
+		t.Errorf("Equal fail on json array.\n")
 	}
 	if JsonEqual(byt3, byt4) {
-		t.Errorf("Equal fail on json array, address change should treat as different.")
+		t.Errorf("Equal fail on json array, address change should treat as different.\n")
 	}
 
 	byt5 := []byte(`{
@@ -76,37 +82,6 @@ func TestEqual(t *testing.T) {
 	}
 }
 
-func TestMarshal(t *testing.T) {
-	type testBaseA struct {
-		name string `json:"name"`
-		age  int    `json:"age"`
-	}
-
-	type testBaseB struct {
-		name string `json:"name"`
-		age  int64  `json:"age"`
-	}
-
-	dataA := &testBaseA{name: "test_name", age: 5}
-	dataB := &testBaseB{name: "test_name", age: 5}
-
-	jsnA, _ := json.Marshal(dataA)
-	jsnB, _ := json.Marshal(&dataB)
-
-	fmt.Println("jsA:", jsnA, " jsB:", jsnB)
-	if JsonEqual(jsnA, jsnB) == false {
-		t.Errorf("json marshal fail")
-	}
-
-	byt := []byte(`{"num":6,"strs":"a"}`)
-	defJsn := make(map[string]interface{})
-	json.Unmarshal(byt, &defJsn)
-	fmt.Println(" Got:", defJsn)
-	for key, val := range defJsn {
-		fmt.Println("key:", key, " val:", val, " type:", reflect.TypeOf(val))
-	}
-}
-
 func TestTraversal(t *testing.T) {
 	byt6 := []byte(`{
 			"bool_val": true,
@@ -124,10 +99,28 @@ func TestTraversal(t *testing.T) {
 
 func TestJsonOpAdd(t *testing.T) {
 
+	if !JsonEqual(JsonAdd(nil, nil), nil) {
+		t.Errorf("Json Add failed on nil \n")
+	}
+
+	bytEmpty := []byte(`{}`)
+
 	byt1 := []byte(`{
 		"num":6,
 		"strs":"a",
 		"num2":7 }`)
+
+	if !JsonEqual(JsonAdd(byt1, nil), nil) {
+		t.Errorf("Json add failed on jsonB nil\n")
+	}
+
+	if !JsonEqual(JsonAdd(nil, byt1), nil) {
+		t.Errorf("Json add failed on jsonA nil\n")
+	}
+
+	if !JsonEqual(JsonAdd(bytEmpty, byt1), byt1) {
+		t.Errorf("Json add failed on empty map A\n")
+	}
 
 	byt2 := []byte(`{
 		"num":1,
