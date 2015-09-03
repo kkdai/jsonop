@@ -97,7 +97,7 @@ func main() {
     	//}
 
 
-    //Substract sample
+    //Subtract sample
 	byt5 := []byte(`{
 		"num":6,
 		"strs":"a",
