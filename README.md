@@ -107,6 +107,33 @@ func main() {
 
 	fmt.Println(string(JsonSubtract(byt5, byt6))) //{"num":5,"num2":4,"strs":"a"}
 
+
+	byt7 := []byte(`{
+			"bool_val": true,
+			"num":6,
+			"num_list": [3, 5, 7],
+			"strs":["a","b"],
+			"stra": {
+				"num2": 7,
+				"strA": "c",
+				"num3": 8
+				} 
+			}`)
+			
+    //Print json struct
+	PrintJson(byt7)
+	
+	//{
+    //	type: float64  key: num  val: 6
+    //	key:num_list val:[3,5,7,]
+    //	key:strs val:[a,b,]
+    //	key: stra {
+    //		type: float64  key: num3  val: 8
+    //		type: float64  key: num2  val: 7
+    //		type: string  key: strA  val: c
+    //	}
+    //	type: bool  key: bool_val  val: true
+    //}
 }
 
 ```
