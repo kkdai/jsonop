@@ -179,7 +179,7 @@ func parseInterface(key string, obj interface{}, degree int) {
 }
 
 //To print out whole map structure
-func TraversalJson(jsn []byte) {
+func PrintJson(jsn []byte) {
 	fmt.Printf("{\n")
 	for key, valA := range getJsonUnmarsh(jsn) {
 		parseInterface(key, valA, 1)

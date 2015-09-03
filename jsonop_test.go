@@ -82,7 +82,7 @@ func TestEqual(t *testing.T) {
 	}
 }
 
-func TestTraversal(t *testing.T) {
+func TestPrint(t *testing.T) {
 	byt6 := []byte(`{
 			"bool_val": true,
 			"num":6,
@@ -94,7 +94,7 @@ func TestTraversal(t *testing.T) {
 				"num3": 8
 				} 
 			}`)
-	TraversalJson(byt6)
+	PrintJson(byt6)
 }
 
 func TestJsonOpAdd(t *testing.T) {
@@ -119,6 +119,10 @@ func TestJsonOpAdd(t *testing.T) {
 	}
 
 	if !JsonEqual(JsonAdd(bytEmpty, byt1), byt1) {
+		t.Errorf("Json add failed on empty map A\n")
+	}
+
+	if !JsonEqual(JsonAdd(byt1, bytEmpty), byt1) {
 		t.Errorf("Json add failed on empty map A\n")
 	}
 
@@ -149,6 +153,7 @@ func TestJsonOpAdd(t *testing.T) {
 		"num":7,
 		"num2":10,
 		"strs":"ab"}`)
+
 	if !JsonEqual(JsonAdd(byt3, byt4), byte34) {
 		t.Errorf("Json op add failed on list\n")
 	}
