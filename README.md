@@ -13,10 +13,14 @@ Json Operation Library help you to do some json basic operation directly. It sup
 
 #### "nil" is specific data type not mean empty.
 
-Please note, `nil`(none) is specific data type, it is not equal to empty json with "{}".
+Please note, `nil`(none) is specific data type, it is not equal to empty json with `"{}"`.
 So, in this case any json operation with `nil` will become `nil`.
 
-        NONE + NONE == NONE
+        //Equal rule
+        None will not equal to Empty Json
+
+        //Addition rule
+        NONE (Add) NONE == NONE
         A (Add) NONE == NONE
         NONE (Add) A == NONE
        
@@ -37,62 +41,76 @@ Usage
 
 ```go
 
-        package main
+package main
+
+import (
+    "fmt"
+    "github/kkdai/"
+)
+
+func main() {
+        //nil will equal to nil as a none type.
+    	fmt.Println(JsonEqual(nil, nil))
+    	//true 
+
+        //Please note: nil is not equal empty json data with "{}"
+    	byt0 := []byte(`{}`)
+    	fmt.Println(JsonEqual(nil, byt0))
+        //false
+
+
+    	byt1 := []byte(`{
+    			"num":6,
+    			"strs":"a",
+    			"num2":7 }`)
+    
+    	byt2 := []byte(`{
+    			"strs":"a",
+    			"num":6,
+    			"num2":7 }`)        
+        //Will treat it as equal.
+    	fmt.Println(JsonEqual(byt1, byt2))
+    	//true
+
+
+        //Sample for json Add
+    	byt3 := []byte(`{
+    		"num":6,
+    		"strs":"a",
+    		"array_a": [ 1 ,2 ,3,4],
+    		"num2":7 }`)
+    
+    	byt4 := []byte(`{
+    		"num":1,
+    		"array_a":[5,6],
+    		"strs":"b",
+    		"num2":3 }`)
+    
+        byte34 := JsonAdd(byt3, byt4)
         
-        import (
-            "fmt"
-            "github/kkdai/"
-        )
-        
-        func main() {
-                //nil will equal to nil as a none type.
-            	fmt.Println(JsonEqual(nil, nil))
-            	//true 
-
-                //Please note: nil is not equal empty json data with "{}"
-            	byt0 := []byte(`{}`)
-            	fmt.Println(JsonEqual(nil, byt0))
-                //false
-        
-
-            	byt1 := []byte(`{
-            			"num":6,
-            			"strs":"a",
-            			"num2":7 }`)
-            
-            	byt2 := []byte(`{
-            			"strs":"a",
-            			"num":6,
-            			"num2":7 }`)        
-                //Will treat it as equal.
-            	fmt.Println(JsonEqual(byt1, byt2))
-            	//true
+    	//byte34 ==>
+    	//{
+    	//	"array_a":[1,2,3,4,5,6],
+    	//	"num":7,
+    	//	"num2":10,
+    	//	"strs":"ab"
+    	//}
 
 
-                //Sample for json Add
-            	byt3 := []byte(`{
-            		"num":6,
-            		"strs":"a",
-            		"array_a": [ 1 ,2 ,3,4],
-            		"num2":7 }`)
-            
-            	byt4 := []byte(`{
-            		"num":1,
-            		"array_a":[5,6],
-            		"strs":"b",
-            		"num2":3 }`)
-            
-                byte34 := JsonAdd(byt3, byt4)
-                
-            	//byte34 ==>
-            	//{
-            	//	"array_a":[1,2,3,4,5,6],
-            	//	"num":7,
-            	//	"num2":10,
-            	//	"strs":"ab"
-            	//}
+    //Substract sample
+	byt5 := []byte(`{
+		"num":6,
+		"strs":"a",
+		"num2":7 }`)
 
-          }
+	byt6 := []byte(`{
+		"num":1,
+		"strs":"b",
+		"num2":3 }`)
+
+	fmt.Println(string(JsonSubtract(byt5, byt6)))	//{"num":5,"num2":4,"strs":"a"}
+
+    }
 
 ```
 

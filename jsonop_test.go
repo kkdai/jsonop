@@ -234,3 +234,73 @@ func TestJsonOpAdd(t *testing.T) {
 		t.Errorf("Json op add failed on B set bigger than A set \n")
 	}
 }
+
+func TestJsonOpSub(t *testing.T) {
+
+	if !JsonEqual(JsonSubtract(nil, nil), nil) {
+		t.Errorf("Json Sub failed on nil \n")
+	}
+
+	byt1 := []byte(`{
+		"num":6,
+		"strs":"a",
+		"num2":7 }`)
+
+	if !JsonEqual(JsonSubtract(byt1, nil), nil) {
+		t.Errorf("Json sub failed on jsonB nil\n")
+	}
+
+	if !JsonEqual(JsonSubtract(nil, byt1), nil) {
+		t.Errorf("Json sub failed on jsonA nil\n")
+	}
+
+	byt2 := []byte(`{
+		"num":1,
+		"strs":"b",
+		"num2":3 }`)
+	byte12 := []byte(`{"num":5,"num2":4,"strs":"a"}`)
+
+	if !JsonEqual(JsonSubtract(byt1, byt2), byte12) {
+		t.Errorf("Json op sub failed on basic item\n")
+	}
+
+	byt7 := []byte(`{
+		"num":6,
+		"strs":"a",
+		"matrix_a": {
+			"num_a":1,
+			"string_a": "a string"
+		},
+		"array_a": [ 1 ,2 ,3,4],
+		"array_b": ["c","d"],
+		"num2":7 }`)
+
+	byt8 := []byte(`{
+		"num":1,
+		"matrix_a": {
+			"num_a":2,
+			"num_bb":7,
+			"string_a": " b string"
+		},
+		"array_a":[5,6],
+		"array_b":["a","b"],
+		"array_c":[0,9,8],
+		"strB": "B string only",
+		"strs":"b",
+		"num2":3 }`)
+
+	byte78 := []byte(`{
+		"array_a":[1,2,3,4],
+		"array_b":["c","d"],
+		"matrix_a":{
+			"num_a":-1,
+			"string_a":"a string"
+		},
+		"num":5,
+		"num2":4,
+		"strs":"a"}`)
+
+	if !JsonEqual(JsonSubtract(byt7, byt8), byte78) {
+		t.Errorf("Json op sub failed on B set bigger than A set \n")
+	}
+}
