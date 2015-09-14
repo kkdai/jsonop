@@ -157,13 +157,13 @@ func parseInterface(key string, obj interface{}, degree int) {
 		fmt.Printf("]\n")
 		break
 	case bool:
-		fmt.Println(indentString+"type:", v, " key:", key, " val:", obj)
+		fmt.Println(indentString+"type:", reflect.TypeOf(obj), " key:", key, " val:", obj)
 		break
 	case string:
-		fmt.Println(indentString+"type:", v, " key:", key, " val:", obj)
+		fmt.Println(indentString+"type:", reflect.TypeOf(obj), " key:", key, " val:", obj)
 		break
 	case int32, int64, float64:
-		fmt.Println(indentString+"type:", v, " key:", key, " val:", obj)
+		fmt.Println(indentString+"type:", reflect.TypeOf(obj), " key:", key, " val:", obj)
 		break
 	case map[string]interface{}:
 		mapObj := obj.(map[string]interface{})
@@ -174,7 +174,7 @@ func parseInterface(key string, obj interface{}, degree int) {
 		fmt.Println(indentString + "}")
 		break
 	default:
-		fmt.Println(indentString+"unknown key:", key, " type:", reflect.TypeOf(obj))
+		fmt.Println(indentString+"unknown key:", key, " type:", reflect.TypeOf(obj), v)
 	}
 }
 
